@@ -16,6 +16,20 @@ export default function Home() {
       perView: 3,
       spacing: 48,
     },
+    breakpoints: {
+      '(max-width: 1024px)': {
+        slides: {
+          perView: 2,
+          spacing: 48,
+        }
+      },
+      '(max-width: 665px)': {
+        slides: {
+          perView: 1,
+          spacing: 48,
+        }
+      }
+    }
   });
 
   return (
