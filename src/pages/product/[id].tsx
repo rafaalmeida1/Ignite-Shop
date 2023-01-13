@@ -91,7 +91,10 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
 }) => {
   if (!params) {
     return {
-      notFound: true,
+      redirect: {
+        destination: '/',
+        permanent: false,
+      }
     };
   }
 
