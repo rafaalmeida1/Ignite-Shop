@@ -13,8 +13,11 @@ export const Header = styled('header', {
     width: '100%',
     maxWidth: 1180,
     margin: '0 auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     
     '@media (max-width: 665px)': {
        padding: '1rem 0'
     }
-})
+}) 

@@ -4,43 +4,54 @@ import Head from "next/head";
 
 import { stripe } from "../lib/stripe";
 import { GetStaticProps } from "next";
+import { useContext, MouseEvent, useEffect, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 
 import { HomeContainer, Product } from "../styles/pages/home";
 import "keen-slider/keen-slider.min.css";
 
 import Stripe from "stripe";
+import { Handbag } from "phosphor-react";
+import { CartProviderContext, ProductProps } from "../context/CartProvider";
+import { ProductSkeleton } from "../components/ProductSkeleton";
 
 interface HomeProps {
-  products: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    price: string;
-  }[];
+  products: ProductProps[];
 }
 
 export default function Home({ products }: HomeProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const { addProductOnCart } = useContext(CartProviderContext);
+
+  useEffect(() => {
+    // fake loading
+    const timeOut = setTimeout(() => setIsLoading(false), 2000);
+
+    return () => clearTimeout(timeOut);
+  }, []);
+
   const [sliderRef] = useKeenSlider({
     slides: {
-      perView: 3,
+      perView: 2.2,
       spacing: 48,
     },
-    breakpoints: {
-      "(max-width: 1024px)": {
-        slides: {
-          perView: 2,
-          spacing: 48,
-        },
-      },
-      "(max-width: 665px)": {
-        slides: {
-          perView: 1,
-          spacing: 48,
-        },
-      },
-    },
+    // breakpoints: {
+    //   "(max-width: 665px)": {
+    //     slides: {
+    //       perView: 1,
+    //       spacing: 48,
+    //     },
+    //   },
+    // },
   });
+
+  function handleAddToCart(
+    e: MouseEvent<HTMLButtonElement>,
+    product: ProductProps
+  ) {
+    e.preventDefault();
+    addProductOnCart(product);
+  }
 
   return (
     <>
@@ -48,24 +59,44 @@ export default function Home({ products }: HomeProps) {
         <title>Home | Ignite Shop</title>
       </Head>
       <HomeContainer ref={sliderRef} className="keen-slider">
-        {products.map((product) => {
-          return (
-            <Link
-              key={product.id}
-              href={`/product/${product.id}`}
-              prefetch={false}
-            >
-              <Product className="keen-slider__slide">
-                <Image src={product.imageUrl} width={520} height={480} alt="" />
+        {isLoading ? (
+          <>
+            <ProductSkeleton className="keen-slider__slide" />
+            <ProductSkeleton className="keen-slider__slide" />
+            <ProductSkeleton className="keen-slider__slide" />
+          </>
+        ) : (
+          <>
+            {products.map((product, i) => {
+              return (
+                <Link
+                  href={`/product/${product.id}`}
+                  prefetch={false}
+                  key={`${product.id}-${i}`}
+                >
+                  <Product className="keen-slider__slide">
+                    <Image
+                      src={product.imageUrl}
+                      width={520}
+                      height={480}
+                      alt=""
+                    />
 
-                <footer>
-                  <strong>{product.name}</strong>
-                  <span>{product.price}</span>
-                </footer>
-              </Product>
-            </Link>
-          );
-        })}
+                    <footer>
+                      <div>
+                        <strong>{product.name}</strong>
+                        <span>{product.price}</span>
+                      </div>
+                      <button onClick={(e) => handleAddToCart(e, product)}>
+                        <Handbag size={24} weight="bold" />{" "}
+                      </button>
+                    </footer>
+                  </Product>
+                </Link>
+              );
+            })}
+          </>
+        )}
       </HomeContainer>
     </>
   );
@@ -87,6 +118,8 @@ export const getStaticProps: GetStaticProps = async () => {
         style: "currency",
         currency: "BRL",
       }).format(price.unit_amount! / 100),
+      numberPrice: price.unit_amount! / 100,
+      defaultPriceId: price.id,
     };
   });
 

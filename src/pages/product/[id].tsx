@@ -3,14 +3,14 @@ import {
   ProductContainer,
   ProductDetails,
 } from "../../styles/pages/product";
+import { useContext } from "react";
 import Image from "next/image";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { stripe } from "../../lib/stripe";
 import Stripe from "stripe";
 import { useRouter } from "next/router";
-import axios from "axios";
-import { useState } from "react";
 import Head from "next/head";
+import { CartProviderContext } from "../../context/CartProvider";
 
 interface ProductProps {
   product: {
@@ -18,32 +18,15 @@ interface ProductProps {
     name: string;
     imageUrl: string;
     price: string;
+    numberPrice: number;
     description: string;
     defaultPriceId: string;
-  };
+  }
 }
 
 export default function Product({ product }: ProductProps) {
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
-    useState(false);
-
-  async function handleBuyProduct() {
-    try {
-      setIsCreatingCheckoutSession(true);
-
-      const response = await axios.post("/api/checkout", {
-        priceId: product.defaultPriceId,
-      });
-
-      const { checkoutUrl } = response.data;
-
-      window.location.href = checkoutUrl;
-    } catch (err) {
-      //Datadog / Sentry futuramente
-      setIsCreatingCheckoutSession(false);
-      alert("Falha ao redirecionar ao checkout!");
-    }
-  }
+  const { addProductOnCart } =
+    useContext(CartProviderContext);
 
   const { isFallback } = useRouter();
 
@@ -68,10 +51,9 @@ export default function Product({ product }: ProductProps) {
           <p>{product.description}</p>
 
           <button
-            disabled={isCreatingCheckoutSession}
-            onClick={() => handleBuyProduct()}
+            onClick={() => {addProductOnCart(product)}}
           >
-            Comprar agora
+            Colocar na sacola
           </button>
         </ProductDetails>
       </ProductContainer>
@@ -92,9 +74,9 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
   if (!params) {
     return {
       redirect: {
-        destination: '/',
+        destination: "/",
         permanent: false,
-      }
+      },
     };
   }
 
@@ -116,6 +98,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
           style: "currency",
           currency: "BRL",
         }).format(price.unit_amount! / 100),
+        numberPrice: price.unit_amount! / 100,
         description: product.description,
         defaultPriceId: price.id,
       },
