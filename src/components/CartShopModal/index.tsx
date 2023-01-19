@@ -16,7 +16,7 @@ import { X, Handbag } from "phosphor-react";
 import { CartProviderContext } from "../../context/CartProvider";
 
 export function CartShopModal() {
-  const { productsInCart, removeProductOnCart, handleBuyProducts, cartTotal } =
+  const { productsInCart, removeProductOnCart, handleBuyProducts, cartTotal, isCreatingCheckoutSession } =
     useContext(CartProviderContext);
 
     const formattedCartTotal = new Intl.NumberFormat('pt-BR', {
@@ -81,7 +81,7 @@ export function CartShopModal() {
               <strong>Valor total</strong>
               <strong>{formattedCartTotal}</strong>
             </div>
-            <button disabled={productsInCart.length === 0} onClick={() => handleBuyProducts()}>Finalizar compra</button>
+            <button disabled={productsInCart.length === 0 || isCreatingCheckoutSession} onClick={() => handleBuyProducts()}>Finalizar compra</button>
           </CartDetails>
         </CartShopModalContent>
       </Dialog.Portal>

@@ -139,6 +139,10 @@ export const ProductDetails = styled("div", {
 
     transition: "all 0.2s",
     cursor: "pointer",
+
+    '&:hover': {
+      opacity: 0.7
+    }
   },
 });
 
