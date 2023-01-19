@@ -30,7 +30,7 @@ export default function Home({ products }: HomeProps) {
 
   useEffect(() => {
     // fake loading
-    const timeOut = setTimeout(() => setIsLoading(false), 2000);
+    const timeOut = setTimeout(() => setIsLoading(false), 400);
 
     return () => clearTimeout(timeOut);
   }, []);
