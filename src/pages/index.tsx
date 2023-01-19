@@ -5,15 +5,14 @@ import Head from "next/head";
 import { stripe } from "../lib/stripe";
 import { GetStaticProps } from "next";
 import { useContext, MouseEvent, useEffect, useState } from "react";
-import { useKeenSlider } from "keen-slider/react";
 
-import { HomeContainer, Product } from "../styles/pages/home";
-import "keen-slider/keen-slider.min.css";
+import { HomeContainer, Product, SliderContainer } from "../styles/pages/home";
 
 import Stripe from "stripe";
 import { Handbag } from "phosphor-react";
 import { CartProviderContext, ProductProps } from "../context/CartProvider";
 import { ProductSkeleton } from "../components/ProductSkeleton";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface HomeProps {
   products: ProductProps[];
@@ -23,27 +22,18 @@ export default function Home({ products }: HomeProps) {
   const [isLoading, setIsLoading] = useState(true);
   const { addProductOnCart } = useContext(CartProviderContext);
 
+  const [emblaRef] = useEmblaCarousel({
+    align: "start",
+    skipSnaps: false,
+    dragFree: true,
+  });
+
   useEffect(() => {
     // fake loading
     const timeOut = setTimeout(() => setIsLoading(false), 2000);
 
     return () => clearTimeout(timeOut);
   }, []);
-
-  const [sliderRef] = useKeenSlider({
-    slides: {
-      perView: 2.2,
-      spacing: 48,
-    },
-    // breakpoints: {
-    //   "(max-width: 665px)": {
-    //     slides: {
-    //       perView: 1,
-    //       spacing: 48,
-    //     },
-    //   },
-    // },
-  });
 
   function handleAddToCart(
     e: MouseEvent<HTMLButtonElement>,
@@ -58,46 +48,54 @@ export default function Home({ products }: HomeProps) {
       <Head>
         <title>Home | Ignite Shop</title>
       </Head>
-      <HomeContainer ref={sliderRef} className="keen-slider">
-        {isLoading ? (
-          <>
-            <ProductSkeleton className="keen-slider__slide" />
-            <ProductSkeleton className="keen-slider__slide" />
-            <ProductSkeleton className="keen-slider__slide" />
-          </>
-        ) : (
-          <>
-            {products.map((product, i) => {
-              return (
-                <Link
-                  href={`/product/${product.id}`}
-                  prefetch={false}
-                  key={`${product.id}-${i}`}
-                >
-                  <Product className="keen-slider__slide">
-                    <Image
-                      src={product.imageUrl}
-                      width={520}
-                      height={480}
-                      alt=""
-                    />
+      <div style={{ overflow: "hidden", width: "100%" }}>
+        <HomeContainer>
+          <div className="embla" ref={emblaRef}>
+            <SliderContainer className="embla__container container">
+              {isLoading ? (
+                <>
+                  <ProductSkeleton className="embla__slide" />
+                  <ProductSkeleton className="embla__slide" />
+                  <ProductSkeleton className="embla__slide" />
+                </>
+              ) : (
+                <>
+                  {products.map((product, i) => {
+                    return (
+                      <Link
+                        href={`/product/${product.id}`}
+                        prefetch={false}
+                        key={`${product.id}-${i}`}
+                      >
+                        <Product className="embla__slide">
+                          <Image
+                            src={product.imageUrl}
+                            width={520}
+                            height={480}
+                            alt=""
+                          />
 
-                    <footer>
-                      <div>
-                        <strong>{product.name}</strong>
-                        <span>{product.price}</span>
-                      </div>
-                      <button onClick={(e) => handleAddToCart(e, product)}>
-                        <Handbag size={24} weight="bold" />{" "}
-                      </button>
-                    </footer>
-                  </Product>
-                </Link>
-              );
-            })}
-          </>
-        )}
-      </HomeContainer>
+                          <footer>
+                            <div>
+                              <strong>{product.name}</strong>
+                              <span>{product.price}</span>
+                            </div>
+                            <button
+                              onClick={(e) => handleAddToCart(e, product)}
+                            >
+                              <Handbag size={24} weight="bold" />{" "}
+                            </button>
+                          </footer>
+                        </Product>
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
+            </SliderContainer>
+          </div>
+        </HomeContainer>
+      </div>
     </>
   );
 }

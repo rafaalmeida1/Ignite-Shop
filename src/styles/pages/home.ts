@@ -12,11 +12,22 @@ export const HomeContainer = styled("main", {
   },
 });
 
+export const SliderContainer = styled("div", {
+  display: "flex", 
+  gap: '3rem',
+  margin: '0 auto',
+  '.embla__slide': {
+    minWidth: '43.5rem',
+  }
+})
+
 export const Product = styled("div", {
   background: "linear-gradient(180deg, #1ea483 0%, #7465d4 100%)",
   borderRadius: 8,
   cursor: "pointer",
   position: "relative",
+  width: "100%",
+  minHeight: 656,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
