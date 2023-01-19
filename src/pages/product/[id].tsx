@@ -11,6 +11,7 @@ import Stripe from "stripe";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { CartProviderContext } from "../../context/CartProvider";
+import { ProductSkeleton } from "../../components/ProductSkeleton";
 
 interface ProductProps {
   product: {
@@ -31,7 +32,7 @@ export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter();
 
   if (isFallback) {
-    return <p>Loading...</p>;
+    return <ProductSkeleton />;
   }
 
   return (
