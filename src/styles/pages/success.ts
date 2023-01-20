@@ -53,6 +53,8 @@ export const ImageContainer = styled('div', {
     boxShadow: '0px 0px 60px rgba(0, 0, 0, 0.8)',
     borderRadius: '50%',
     position: 'relative',
+    transition: 'all 0.2s linear',
+    scale: 0.9,
 
     display: 'flex',
     alignItems: 'center',
@@ -61,4 +63,9 @@ export const ImageContainer = styled('div', {
     img: {
         objectFit: 'cover',
     },
+
+    '&:hover': {
+        zIndex: 2,
+        scale: 1
+    }
 })
